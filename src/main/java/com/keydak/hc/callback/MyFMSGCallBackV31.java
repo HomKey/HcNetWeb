@@ -54,44 +54,13 @@ public class MyFMSGCallBackV31 implements HCNetSDK.FMSGCallBack_V31 {
                     eventInfoService.save(eventInfo);
                 });
                 break;
-            case HCNetSDK.COMM_ID_INFO_ALARM:
-                break;
-            case HCNetSDK.COMM_PASSNUM_INFO_ALARM:
-                break;
+//            case HCNetSDK.COMM_ID_INFO_ALARM:
+//                break;
+//            case HCNetSDK.COMM_PASSNUM_INFO_ALARM:
+//                break;
             default:
                 break;
         }
         return true;
-
-//        if (lCommand == 20482) {
-//            HCNetSDK.NET_DVR_ACS_ALARM_INFO strACSInfo = new HCNetSDK.NET_DVR_ACS_ALARM_INFO();
-//            strACSInfo.write();
-//            Pointer pACSInfo = strACSInfo.getPointer();
-//            pACSInfo.write(0L, pAlarmInfo.getByteArray(0L, strACSInfo.size()), 0, strACSInfo.size());
-//            strACSInfo.read();
-//            if ((strACSInfo.dwMajor == 5) && (strACSInfo.dwMinor == 75)) {
-//                String ip = new String(pAlarmer.sDeviceIP).trim();
-//                String punchTime = strACSInfo.struTime.toStringTime();
-//                String empCode = Integer.toString(strACSInfo.struAcsEventInfo.dwEmployeeNo);
-//                String cardNo = new String(strACSInfo.struAcsEventInfo.byCardNo).trim();
-//                System.out.println(ip + punchTime + empCode + cardNo);
-//            }
-//        }
-//        String empCode;
-//        switch (lCommand) {
-//            case 20482:
-//                HCNetSDK.NET_DVR_ACS_ALARM_INFO strACSInfo = new HCNetSDK.NET_DVR_ACS_ALARM_INFO();
-//                strACSInfo.write();
-//                Pointer pACSInfo = strACSInfo.getPointer();
-//                pACSInfo.write(0L, pAlarmInfo.getByteArray(0L, strACSInfo.size()), 0, strACSInfo.size());
-//                strACSInfo.read();
-//                String deviceIP = new String(pAlarmer.sDeviceIP).trim();
-//                String lUserID = Integer.toString(pAlarmer.lUserID);
-//                String time = strACSInfo.struTime.toStringTime();
-//                String cardNo = new String(strACSInfo.struAcsEventInfo.byCardNo);
-//                empCode = Integer.toString(strACSInfo.struAcsEventInfo.dwEmployeeNo);
-//                break;
-//        }
-//        return true;
     }
 }

@@ -4,11 +4,15 @@ import com.keydak.hc.callback.MyFMSGCallBack;
 import com.keydak.hc.core.HCNetSDK;
 import com.keydak.hc.core.structure.AcsWorkStatus;
 import com.keydak.hc.callback.MyFMSGCallBackV31;
+import com.keydak.hc.dto.AcsWorkDTO;
+import com.keydak.hc.service.IEventInfoService;
+import com.keydak.hc.service.RealTimeDataService;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.annotation.Order;
@@ -23,10 +27,20 @@ public class HcDoorAccessApplication implements ApplicationRunner {
     static HCNetSDK hCNetSDK = null;// HCNetSDK.INSTANCE;
     HCNetSDK.NET_DVR_USER_LOGIN_INFO m_strLoginInfo = null; // new HCNetSDK.NET_DVR_USER_LOGIN_INFO();//设备登录信息
     HCNetSDK.NET_DVR_DEVICEINFO_V40 m_strDeviceInfo = null; // new HCNetSDK.NET_DVR_DEVICEINFO_V40();//设备信息
-    String deviceIp;//已登录设备的IP地址
-    short devicePort;//已登录设备的端口
-    String userName;//设备用户名
-    String password;//设备密码
+
+    @Value("${HcNet.deviceIp}")
+    private String deviceIp;//已登录设备的IP地址
+    @Value("${HcNet.port}")
+    private short devicePort;//已登录设备的端口
+    @Value("${HcNet.userName}")
+    private String userName;//设备用户名
+    @Value("${HcNet.password}")
+    private String password;//设备密码
+
+    @Autowired
+    private IEventInfoService eventInfoService;
+    @Autowired
+    private RealTimeDataService realTimeDataServiceImpl;
 
     private static int lUserID = -1;//用户句柄
     int lAlarmHandle = -1;//报警布防句柄
@@ -38,32 +52,28 @@ public class HcDoorAccessApplication implements ApplicationRunner {
     @Autowired
     private HCNetSDK.FMSGCallBack fMSFCallBack;
 
-    AcsWorkStatus.NET_DVR_ACS_WORK_STATUS_V50 acsWorkStatus;
+    private static AcsWorkStatus.NET_DVR_ACS_WORK_STATUS_V50 acsWorkStatus;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
         initParamConfig();
-//        login(deviceIp, devicePort, userName, password);
+        login(deviceIp, devicePort, userName, password);
         if (lUserID == -1) {
             logger.error("注册失败");
             return;
         }
         //获取当前门状态
         if (getAcsWorkStatus(lUserID)) {
-            // acsWorkStatus
+            realTimeDataServiceImpl.saveAcsWorkData(acsWorkStatus);
         }
         setupAlarmChan();
 //        startAlarmListen();
     }
 
     private void initParamConfig() {
-        deviceIp = "192.168.7.140";
-        devicePort = 6001;
-        userName = "user";
-        password = "password";
-//        fMSFCallBack_V31 = new MyFMSGCallBackV31();
-//        fMSFCallBack = new MyFMSGCallBack();
-//        acsWorkStatus = new AcsWorkStatus.NET_DVR_ACS_WORK_STATUS_V50();
+        fMSFCallBack_V31 = new MyFMSGCallBackV31();
+        fMSFCallBack = new MyFMSGCallBack();
+        acsWorkStatus = new AcsWorkStatus.NET_DVR_ACS_WORK_STATUS_V50();
     }
 
     /**
@@ -103,6 +113,7 @@ public class HcDoorAccessApplication implements ApplicationRunner {
             logger.info("布防成功");
         }
     }
+
     private void closeAlarmChan() {
         if (lAlarmHandle > -1) {
             if (hCNetSDK.NET_DVR_CloseAlarmChan_V30(lAlarmHandle)) {
@@ -121,7 +132,8 @@ public class HcDoorAccessApplication implements ApplicationRunner {
             logger.info("启动监听成功");
         }
     }
-    private void stopAlarmListen(){
+
+    private void stopAlarmListen() {
         if (lAlarmHandle > -1) {
             if (hCNetSDK.NET_DVR_StopListen_V30(lAlarmHandle)) {
                 logger.info("撤防成功");

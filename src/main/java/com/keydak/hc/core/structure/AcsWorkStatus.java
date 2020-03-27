@@ -7,8 +7,8 @@ public class AcsWorkStatus {
     private static final int MAX_DOOR_NUM_256 = 256;
     private static final int MAX_CASE_SENSOR_NUM_8 = 8;
     private static final int MAX_CARD_READER_NUM_512 = 512;
-    private static final int MAX_ALARMHOST_ALARMIN_NUM_521 = 512;
-    private static final int MAX_ALARMHOST_ALARMOUT_NUM_521 = 512;
+    private static final int MAX_ALARMHOST_ALARMIN_NUM_512 = 512;
+    private static final int MAX_ALARMHOST_ALARMOUT_NUM_512 = 512;
 
     public static class NET_DVR_ACS_WORK_STATUS_V50 extends Structure {/* 门禁主机工作状态结构体 */
         public int dwSize; /* 结构大小 */
@@ -26,9 +26,9 @@ public class AcsWorkStatus {
         public byte[] byCardReaderOnlineStatus = new byte[MAX_CARD_READER_NUM_512];
         public byte[] byCardReaderAntiDismantleStatus = new byte[MAX_CARD_READER_NUM_512];
         public byte[] byCardReaderVerifyMode = new byte[MAX_CARD_READER_NUM_512];
-        public byte[] bySetupAlarmStatus = new byte[MAX_ALARMHOST_ALARMIN_NUM_521];
-        public byte[] byAlarmInStatus = new byte[MAX_ALARMHOST_ALARMIN_NUM_521];
-        public byte[] byAlarmOutStatus = new byte[MAX_ALARMHOST_ALARMOUT_NUM_521];
+        public byte[] bySetupAlarmStatus = new byte[MAX_ALARMHOST_ALARMIN_NUM_512];
+        public byte[] byAlarmInStatus = new byte[MAX_ALARMHOST_ALARMIN_NUM_512];
+        public byte[] byAlarmOutStatus = new byte[MAX_ALARMHOST_ALARMOUT_NUM_512];
         public int dwCardNum;
         public byte byFireAlarmStatus;
         public byte byBatteryChargeStatus;
