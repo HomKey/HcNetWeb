@@ -51,6 +51,27 @@ public class MyFMSGCallBackV31 implements HCNetSDK.FMSGCallBack_V31 {
                     eventInfo.setNetUser(new String(strACSInfo.sNetUser));
 //                        eventInfo.setNetUser(Base64.getEncoder().encodeToString(strACSInfo.sNetUser));
                     eventInfo.setChannelNo(strACSInfo.dwIOTChannelNo);
+//                    NET_DVR_ACS_EVENT_INFO
+                    eventInfo.setCardNo(new String(strACSInfo.struAcsEventInfo.byCardNo));
+                    eventInfo.setCardType(strACSInfo.struAcsEventInfo.byCardType);
+                    eventInfo.setWhiteListNo(strACSInfo.struAcsEventInfo.byWhiteListNo);
+                    eventInfo.setReportChannel(strACSInfo.struAcsEventInfo.byReportChannel);
+                    eventInfo.setCardReaderKind(strACSInfo.struAcsEventInfo.byCardReaderKind);
+                    eventInfo.setCardReaderNo(strACSInfo.struAcsEventInfo.dwCardReaderNo);
+                    eventInfo.setDoorNo(strACSInfo.struAcsEventInfo.dwDoorNo);
+                    eventInfo.setVerifyNo(strACSInfo.struAcsEventInfo.dwVerifyNo);
+                    eventInfo.setAlarmInNo(strACSInfo.struAcsEventInfo.dwAlarmInNo);
+                    eventInfo.setAlarmOutNo(strACSInfo.struAcsEventInfo.dwAlarmOutNo);
+                    eventInfo.setCaseSensorNo(strACSInfo.struAcsEventInfo.dwCaseSensorNo);
+                    eventInfo.setRs485No(strACSInfo.struAcsEventInfo.dwRs485No);
+                    eventInfo.setMultiCardGroupNo(strACSInfo.struAcsEventInfo.dwMultiCardGroupNo);
+                    eventInfo.setAccessChannel(strACSInfo.struAcsEventInfo.wAccessChannel);
+                    eventInfo.setDeviceNo(strACSInfo.struAcsEventInfo.byDeviceNo);
+                    eventInfo.setDistractControlNo(strACSInfo.struAcsEventInfo.byDistractControlNo);
+                    eventInfo.setEmployeeNo(strACSInfo.struAcsEventInfo.dwEmployeeNo);
+                    eventInfo.setLocalControllerID(strACSInfo.struAcsEventInfo.wLocalControllerID);
+
+                    // ...
                     eventInfoService.save(eventInfo);
                 });
                 break;

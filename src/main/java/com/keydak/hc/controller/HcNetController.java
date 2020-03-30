@@ -5,7 +5,7 @@ import com.keydak.hc.dto.ResponseResult;
 import com.keydak.hc.entity.EventInfo;
 import com.keydak.hc.enums.ResponseEnum;
 import com.keydak.hc.service.IEventInfoService;
-import com.keydak.hc.service.IRealTimeDataService;
+import com.keydak.hc.service.IHcDoorAccessService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,7 +22,7 @@ public class HcNetController {
     @Autowired
     private IEventInfoService eventInfoService;
     @Autowired
-    private IRealTimeDataService realTimeDataService;
+    private IHcDoorAccessService hcDoorAccessService;
 
     @GetMapping("/list")
     public ResponseResult findAllByPage(
@@ -38,6 +38,6 @@ public class HcNetController {
             @RequestParam(value = "doorCount", defaultValue = "0", required = false) Integer doorCount,
             @RequestParam(value = "cardCount", defaultValue = "0", required = false) Integer cardCount,
             @RequestParam(value = "alarmCount", defaultValue = "0", required = false) Integer alarmCount) {
-        return new ResponseResult(ResponseEnum.SUCCESS, realTimeDataService.getAcsWordData(doorCount, cardCount, alarmCount));
+        return new ResponseResult(ResponseEnum.SUCCESS, hcDoorAccessService.getAcsWordData(doorCount, cardCount, alarmCount));
     }
 }
