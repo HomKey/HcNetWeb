@@ -3,24 +3,31 @@ package com.keydak.hc.service;
 import com.keydak.hc.callback.MyFMSGCallBack;
 import com.keydak.hc.callback.MyFMSGCallBackV31;
 import com.keydak.hc.core.HCNetSDK;
+import com.keydak.hc.core.HCNetSDKPath;
 import com.keydak.hc.core.structure.AcsWorkStatus;
 import com.keydak.hc.dto.AcsWorkDTO;
+import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import java.io.File;
 
 @Service
 @Scope("singleton")
 public class HcDoorAccessService implements IHcDoorAccessService {
     private static final Logger logger = LogManager.getLogger(HcDoorAccessService.class);
+
+    @Value("${HcNet.sdk.path}")
+    public static String dllPath;//HCNetSDK.dll 文件路径
 
     private HCNetSDK hCNetSDK;
     private HCNetSDK.FMSGCallBack_V31 fMSFCallBack_V31; // 布防
@@ -46,16 +53,17 @@ public class HcDoorAccessService implements IHcDoorAccessService {
     @PostConstruct
     public void init() {
         logger.info("init");
-//        hCNetSDK = HCNetSDK.INSTANCE;
-//        fMSFCallBack_V31 = new MyFMSGCallBackV31();
-//        fMSFCallBack = new MyFMSGCallBack();
-//        acsWorkStatus = new AcsWorkStatus.NET_DVR_ACS_WORK_STATUS_V50();
-//        m_strLoginInfo = new HCNetSDK.NET_DVR_USER_LOGIN_INFO();//设备登录信息
-//        m_strDeviceInfo = new HCNetSDK.NET_DVR_DEVICEINFO_V40();//设备信息
+        hCNetSDK = HCNetSDK.INSTANCE;
+        fMSFCallBack_V31 = new MyFMSGCallBackV31();
+        fMSFCallBack = new MyFMSGCallBack();
+        acsWorkStatus = new AcsWorkStatus.NET_DVR_ACS_WORK_STATUS_V50();
+        m_strLoginInfo = new HCNetSDK.NET_DVR_USER_LOGIN_INFO();//设备登录信息
+        m_strDeviceInfo = new HCNetSDK.NET_DVR_DEVICEINFO_V40();//设备信息
     }
 
     @Override
     public int login(String m_sDeviceIP, short m_sPort, String m_sUsername, String m_sPassword) {
+        logger.info("login");
         m_strLoginInfo.sDeviceAddress = new byte[HCNetSDK.NET_DVR_DEV_ADDRESS_MAX_LEN];
         System.arraycopy(m_sDeviceIP.getBytes(), 0, m_strLoginInfo.sDeviceAddress, 0, m_sDeviceIP.length());
         m_strLoginInfo.sUserName = new byte[HCNetSDK.NET_DVR_LOGIN_USERNAME_MAX_LEN];
@@ -84,6 +92,7 @@ public class HcDoorAccessService implements IHcDoorAccessService {
 
     @Override
     public void setupAlarmChan() {
+        logger.info("setupAlarmChan");
         //设置报警回调函数，这个函数将会上次人脸识别比对结果
         Pointer pUser = null;
         if (!hCNetSDK.NET_DVR_SetDVRMessageCallBack_V31(fMSFCallBack_V31, pUser)) {
@@ -105,6 +114,7 @@ public class HcDoorAccessService implements IHcDoorAccessService {
 
     @Override
     public void closeAlarmChan() {
+        logger.info("closeAlarmChan");
         if (lAlarmHandle > -1) {
             if (hCNetSDK.NET_DVR_CloseAlarmChan_V30(lAlarmHandle)) {
                 logger.info("撤防成功");
@@ -115,6 +125,7 @@ public class HcDoorAccessService implements IHcDoorAccessService {
 
     @Override
     public void startAlarmListen(String deviceIp, short devicePort) {
+        logger.info("startAlarmListen");
         Pointer pUser = null;
         lListenHandle = hCNetSDK.NET_DVR_StartListen_V30(deviceIp, devicePort, fMSFCallBack, pUser);
         if (lListenHandle < 0) {
@@ -126,16 +137,18 @@ public class HcDoorAccessService implements IHcDoorAccessService {
 
     @Override
     public void stopAlarmListen() {
-        if (lAlarmHandle > -1) {
-            if (hCNetSDK.NET_DVR_StopListen_V30(lAlarmHandle)) {
+        logger.info("stopAlarmListen");
+        if (lListenHandle > -1) {
+            if (hCNetSDK.NET_DVR_StopListen_V30(lListenHandle)) {
                 logger.info("撤防成功");
-                lAlarmHandle = -1;
+                lListenHandle = -1;
             }
         }
     }
 
     @Override
     public boolean updateAcsWorkData() {
+        logger.info("updateAcsWorkData");
         acsWorkStatus.clear();
         acsWorkStatus.write();
         Pointer acsWorkStatusPointer = acsWorkStatus.getPointer();
@@ -190,6 +203,7 @@ public class HcDoorAccessService implements IHcDoorAccessService {
 
     @Override
     public AcsWorkDTO getAcsWordData(int doorCount, int cardCount, int alarmCount) {
+        logger.info("getAcsWordData");
         AcsWorkDTO acsWorkDTO = new AcsWorkDTO();
         BeanUtils.copyProperties(acsWorkDTO, this.acsWorkDTO);
         doorCount = Math.min(doorCount, this.acsWorkDTO.getDoors().size());

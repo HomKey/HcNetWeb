@@ -12,21 +12,16 @@ import org.springframework.core.annotation.Order;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 @Component
 @Order(1)
 public class HcDoorAccessApplication implements ApplicationRunner {
     private static final Logger logger = LogManager.getLogger(HcDoorAccessApplication.class);
-    private boolean test = true;
-    private static final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//设置日期格式
+    private boolean startUp = false;
+    private int userId = -1;
 
     @Autowired
     private IHcDoorAccessService hcDoorAccessService;
-
-    @Autowired
-    private IEventInfoService eventInfoService;
 
     @Value("${HcNet.deviceIp}")
     private String deviceIp;//已登录设备的IP地址
@@ -43,16 +38,14 @@ public class HcDoorAccessApplication implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        if (!test) {
-            if (hcDoorAccessService.login(deviceIp, devicePort, userName, password) == -1){
-                logger.error("注册失败");
-                return;
-            };
-        }
-        //获取当前门状态
-        getAndSaveAcsWorkStatus();
-//        hcDoorAccessService.setupAlarmChan();
+        userId = hcDoorAccessService.login(deviceIp, devicePort, userName, password);
+        if (userId == -1) {
+            logger.error("注册失败");
+        } else {
+            startUp = true;
+            hcDoorAccessService.setupAlarmChan();
 //        hcDoorAccessService.startAlarmListen();
+        }
     }
 
     /**
@@ -61,18 +54,13 @@ public class HcDoorAccessApplication implements ApplicationRunner {
      * @param lUserID
      * @return
      */
-    /**fixedDelay:上一次执行完毕时间点之后5秒再执行*/
+    /**
+     * fixedDelay:上一次执行完毕时间点之后5秒再执行
+     */
     @Scheduled(fixedDelay = 5000)
     private void getAndSaveAcsWorkStatus() {
-        if (test){
-            try {
-                Thread.sleep(5000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            System.out.println(df.format(new Date()));
-            return;
+        if (startUp && userId != -1) {
+            hcDoorAccessService.updateAcsWorkData();
         }
-        hcDoorAccessService.updateAcsWorkData();
     }
 }

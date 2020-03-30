@@ -3,8 +3,6 @@ HcNet:
   port: 6001
   userName: admin
   password: admin
-sdk:
-  path: /HCNetSDK.dll
 server:
   port: 8780
   servlet:
