@@ -10,10 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/hc")
@@ -24,6 +21,13 @@ public class HcNetController {
     @Autowired
     private IHcDoorAccessService hcDoorAccessService;
 
+    /**
+     * 门禁历史记录（读数据库）
+     * @param page
+     * @param pageSize
+     * @return
+     */
+    @CrossOrigin
     @GetMapping("/list")
     public ResponseResult findAllByPage(
             @RequestParam(value = "page", defaultValue = "1", required = false) Integer page,
@@ -33,6 +37,14 @@ public class HcNetController {
         return new ResponseResult(ResponseEnum.SUCCESS, eventInfoList);
     }
 
+    /**
+     * 门禁状态（读内存数据）
+     * @param doorCount
+     * @param cardCount
+     * @param alarmCount
+     * @return
+     */
+    @CrossOrigin
     @GetMapping("/acsWork")
     public ResponseResult getAcsWork(
             @RequestParam(value = "doorCount", defaultValue = "0", required = false) Integer doorCount,

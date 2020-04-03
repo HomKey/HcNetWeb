@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.io.File;
+import java.util.ArrayList;
 
 @Service
 @Scope("singleton")
@@ -205,16 +206,19 @@ public class HcDoorAccessService implements IHcDoorAccessService {
     public AcsWorkDTO getAcsWordData(int doorCount, int cardCount, int alarmCount) {
         logger.info("getAcsWordData");
         AcsWorkDTO acsWorkDTO = new AcsWorkDTO();
-        BeanUtils.copyProperties(acsWorkDTO, this.acsWorkDTO);
+        BeanUtils.copyProperties(this.acsWorkDTO, acsWorkDTO);
         doorCount = Math.min(doorCount, this.acsWorkDTO.getDoors().size());
+        acsWorkDTO.setDoors(new ArrayList<>());
         for (int i = 0; i < doorCount; i++) {
             acsWorkDTO.addDoors(this.acsWorkDTO.getDoors().get(i));
         }
         cardCount = Math.min(cardCount, this.acsWorkDTO.getCardReaders().size());
+        acsWorkDTO.setCardReaders(new ArrayList<>());
         for (int i = 0; i < cardCount; i++) {
             acsWorkDTO.addCardReaders(this.acsWorkDTO.getCardReaders().get(i));
         }
         alarmCount = Math.min(alarmCount, this.acsWorkDTO.getAlarmHosts().size());
+        acsWorkDTO.setAlarmHosts(new ArrayList<>());
         for (int i = 0; i < alarmCount; i++) {
             acsWorkDTO.addAlarmHosts(this.acsWorkDTO.getAlarmHosts().get(i));
         }

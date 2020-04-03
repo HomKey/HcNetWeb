@@ -3,6 +3,9 @@ package com.keydak.hc.dto;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 门禁状态
+ */
 public class AcsWorkDTO {
     private Boolean[] caseStatus; // 事件报警输入状态：0- 无输入，1- 有输入
     private int batteryVoltage; // 蓄电池电压值，实际值乘10，单位：伏特
