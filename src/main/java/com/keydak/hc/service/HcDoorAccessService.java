@@ -27,9 +27,6 @@ import java.util.ArrayList;
 public class HcDoorAccessService implements IHcDoorAccessService {
     private static final Logger logger = LogManager.getLogger(HcDoorAccessService.class);
 
-    @Value("${HcNet.sdk.path}")
-    public static String dllPath;//HCNetSDK.dll 文件路径
-
     private HCNetSDK hCNetSDK;
     private HCNetSDK.FMSGCallBack_V31 fMSFCallBack_V31; // 布防
     private HCNetSDK.FMSGCallBack fMSFCallBack;

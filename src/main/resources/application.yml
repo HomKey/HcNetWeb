@@ -1,8 +1,14 @@
-HcNet:
-  deviceIp: 192.168.7.136
-  port: 6001
-  userName: admin
-  password: admin
+hik:
+  doors:
+    - deviceIp: 192.168.7.136
+      port: 6001
+      userName: admin
+      password: admin
+  videos:
+    - deviceIp: 192.168.7.180
+      port: 8000
+      userName: admin
+      password: keydak123
 server:
   port: 8780
   servlet:
