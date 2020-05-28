@@ -48,7 +48,7 @@ public class HcDoorAccessService implements IHcDoorAccessService {
 
     private AcsWorkDTO acsWorkDTO = new AcsWorkDTO();
 
-    @PostConstruct
+//    @PostConstruct
     public void init() {
         logger.info("init");
         hCNetSDK = HCNetSDK.INSTANCE;
@@ -76,7 +76,7 @@ public class HcDoorAccessService implements IHcDoorAccessService {
     }
 
     @Override
-    @PreDestroy
+//    @PreDestroy
     public void logout() {
         logger.info("logout");
         closeAlarmChan();

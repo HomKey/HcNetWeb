@@ -1,21 +1,30 @@
 package com.keydak.hc.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
+@Scope("singleton")
 @ConfigurationProperties(prefix = "hik")
 public class HcNetDeviceConfig {
-    private static List<DeviceInfo> doors;
-    private static List<DeviceInfo> videos;
-
-    public static List<DeviceInfo> getDoors() {
+    private List<DeviceInfo> doors;
+    private List<DeviceInfo> videos;
+    public List<DeviceInfo> getDoors() {
         return doors;
     }
-    public static List<DeviceInfo> getVideos() {
+    public List<DeviceInfo> getVideos() {
         return videos;
+    }
+
+    public void setDoors(List<DeviceInfo> doors) {
+        this.doors = doors;
+    }
+
+    public void setVideos(List<DeviceInfo> videos) {
+        this.videos = videos;
     }
 
     public static class DeviceInfo {

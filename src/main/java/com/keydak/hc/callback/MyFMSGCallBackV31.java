@@ -2,6 +2,7 @@ package com.keydak.hc.callback;
 
 import com.keydak.hc.core.HCNetSDK;
 import com.keydak.hc.entity.EventInfo;
+import com.keydak.hc.enums.HikVcaEventEnum;
 import com.keydak.hc.service.IEventInfoService;
 import com.keydak.hc.util.HexUtil;
 import com.sun.jna.Pointer;
@@ -15,7 +16,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-@Component
+@Component("fmsgCallBackV31")
 public class MyFMSGCallBackV31 implements HCNetSDK.FMSGCallBack_V31 {
 
     @Autowired
@@ -28,6 +29,15 @@ public class MyFMSGCallBackV31 implements HCNetSDK.FMSGCallBack_V31 {
     @Override
     public boolean invoke(int lCommand, HCNetSDK.NET_DVR_ALARMER pAlarmer, Pointer pAlarmInfo, int dwBufLen, Pointer pUser) {
         switch (lCommand) {
+            case HCNetSDK.COMM_ALARM_RULE:
+                HCNetSDK.NET_VCA_RULE_ALARM alarmInfo = new HCNetSDK.NET_VCA_RULE_ALARM();
+                alarmInfo.write();
+                Pointer pInfoV40 = alarmInfo.getPointer();
+                pInfoV40.write(0, pAlarmInfo.getByteArray(0, alarmInfo.size()), 0, alarmInfo.size());
+                alarmInfo.read();
+                int dwEventType = alarmInfo.struRuleInfo.dwEventType;
+                System.out.println(HikVcaEventEnum.getMessage(dwEventType));
+                break;
             case HCNetSDK.COMM_ALARM_ACS:
                 HCNetSDK.NET_DVR_ACS_ALARM_INFO strACSInfo = new HCNetSDK.NET_DVR_ACS_ALARM_INFO();
                 strACSInfo.write();

@@ -13,11 +13,12 @@ import org.springframework.core.annotation.Order;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 
-@Component
-@Order(1)
+//@Component
+//@Order(1)
 public class HcDoorAccessApplication implements ApplicationRunner {
     private static final Logger logger = LogManager.getLogger(HcDoorAccessApplication.class);
     private boolean startUp = false;
@@ -26,6 +27,8 @@ public class HcDoorAccessApplication implements ApplicationRunner {
     @Autowired
     private IHcDoorAccessService hcDoorAccessService;
 
+    @Resource
+    private HcNetDeviceConfig hcNetDeviceConfig;
 //    @Value("${HcNet.deviceIp}")
 //    private String deviceIp;//已登录设备的IP地址
 //    @Value("${HcNet.port}")
@@ -41,7 +44,7 @@ public class HcDoorAccessApplication implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        List<HcNetDeviceConfig.DeviceInfo> doors = HcNetDeviceConfig.getDoors();
+        List<HcNetDeviceConfig.DeviceInfo> doors = hcNetDeviceConfig.getDoors();
         userId = new int[doors.size()];
         String deviceIp = doors.get(0).getDeviceIp();
         short devicePort = Short.parseShort(doors.get(0).getPort());
