@@ -26,11 +26,11 @@ public class HikService implements IHikService {
     @PostConstruct
     public void init() {
         hCNetSDK = HCNetSDK.INSTANCE;
-        if (!hCNetSDK.NET_DVR_Init()){
+        if (!hCNetSDK.NET_DVR_Init()) {
             logger.error("NET_DVR_Init error");
         }
         Pointer pUser = null;
-        if (!hCNetSDK.NET_DVR_SetDVRMessageCallBack_V31(fmsgCallBackV31, pUser)){
+        if (!hCNetSDK.NET_DVR_SetDVRMessageCallBack_V31(fmsgCallBackV31, pUser)) {
             logger.error("NET_DVR_SetDVRMessageCallBack_V31 error");
         }
         m_strLoginInfo = new HCNetSDK.NET_DVR_USER_LOGIN_INFO();//设备登录信息
@@ -38,8 +38,8 @@ public class HikService implements IHikService {
     }
 
     @PreDestroy
-    private void destroy(){
-        if (!hCNetSDK.NET_DVR_Cleanup()){
+    private void destroy() {
+        if (!hCNetSDK.NET_DVR_Cleanup()) {
             logger.error("NET_DVR_Cleanup error");
         }
     }
@@ -60,10 +60,8 @@ public class HikService implements IHikService {
 
     @Override
     public boolean logout(int userId) {
-        if (userId > -1) {
-            return hCNetSDK.NET_DVR_Logout(userId);
-        }
-        return false;
+        if (userId < 0) return false;
+        return hCNetSDK.NET_DVR_Logout(userId);
     }
 
 
@@ -73,7 +71,7 @@ public class HikService implements IHikService {
             HikSetUpAlarmEnum.Level level,
             HikSetUpAlarmEnum.AlarmInfoType alarmInfoType,
             HikSetUpAlarmEnum.DeployType deployType
-    ){
+    ) {
         HCNetSDK.NET_DVR_SETUPALARM_PARAM m_strAlarmInfo = new HCNetSDK.NET_DVR_SETUPALARM_PARAM();
         m_strAlarmInfo.dwSize = m_strAlarmInfo.size();
         m_strAlarmInfo.byLevel = level.getValue();
@@ -85,6 +83,7 @@ public class HikService implements IHikService {
 
     @Override
     public boolean closeAlarmChan(int alarmChanId) {
+        if (alarmChanId < 0) return false;
         return hCNetSDK.NET_DVR_CloseAlarmChan_V30(alarmChanId);
     }
 }

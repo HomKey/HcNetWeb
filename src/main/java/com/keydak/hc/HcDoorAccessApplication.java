@@ -1,8 +1,10 @@
 package com.keydak.hc;
 
 import com.keydak.hc.config.HcNetDeviceConfig;
+import com.keydak.hc.enums.HikSetUpAlarmEnum;
 import com.keydak.hc.service.IEventInfoService;
 import com.keydak.hc.service.IHcDoorAccessService;
+import com.keydak.hc.service.IHikService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,50 +15,44 @@ import org.springframework.core.annotation.Order;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
 import java.util.List;
 
 
-//@Component
-//@Order(1)
+@Component
+@Order(1)
 public class HcDoorAccessApplication implements ApplicationRunner {
     private static final Logger logger = LogManager.getLogger(HcDoorAccessApplication.class);
-    private boolean startUp = false;
-    private int[] userId;
+    private int[] userIds;
+    private int[] alarmChanIds;
 
-    @Autowired
+    @Resource
     private IHcDoorAccessService hcDoorAccessService;
 
     @Resource
-    private HcNetDeviceConfig hcNetDeviceConfig;
-//    @Value("${HcNet.deviceIp}")
-//    private String deviceIp;//已登录设备的IP地址
-//    @Value("${HcNet.port}")
-//    private short devicePort;//已登录设备的端口
-//    @Value("${HcNet.userName}")
-//    private String userName;//设备用户名
-//    @Value("${HcNet.password}")
-//    private String password;//设备密码
+    private IHikService hikService;
 
-    private int lUserID = -1;//用户句柄
-    private int lAlarmHandle = -1;//报警布防句柄
-    private int lListenHandle = -1;//报警监听句柄
+    @Resource
+    private HcNetDeviceConfig hcNetDeviceConfig;
 
     @Override
-    public void run(ApplicationArguments args) throws Exception {
+    public void run(ApplicationArguments args) {
         List<HcNetDeviceConfig.DeviceInfo> doors = hcNetDeviceConfig.getDoors();
-        userId = new int[doors.size()];
-        String deviceIp = doors.get(0).getDeviceIp();
-        short devicePort = Short.parseShort(doors.get(0).getPort());
-        String userName = doors.get(0).getUserName();
-        String password = doors.get(0).getPassword();
-        userId[0] = hcDoorAccessService.login(deviceIp, devicePort, userName, password);
-        if (userId[0] == -1) {
-            logger.error("注册失败");
-        } else {
-            startUp = true;
-            hcDoorAccessService.setupAlarmChan();
-//        hcDoorAccessService.startAlarmListen();
+        if (doors == null) return;
+        userIds = new int[doors.size()];
+        alarmChanIds = new int[doors.size()];
+        for (int i = 0; i < doors.size(); i++) {
+            HcNetDeviceConfig.DeviceInfo door = doors.get(i);
+            int userId = hikService.login(door.getDeviceIp(), Short.parseShort(door.getPort()), door.getUserName(), door.getPassword());
+            userIds[i] = userId;
+            alarmChanIds[i] = -1;
+            if (userId == -1) {
+                logger.error("注册失败");
+            } else {
+                alarmChanIds[i] = hikService.setUpAlarmChan(userIds[i], HikSetUpAlarmEnum.Level.MIDDLE, HikSetUpAlarmEnum.AlarmInfoType.NEW,HikSetUpAlarmEnum.DeployType.REALTIME);
+                hcDoorAccessService.startAlarmListen(door.getDeviceIp(), Short.parseShort(door.getPort()));
+            }
         }
     }
 
@@ -71,8 +67,23 @@ public class HcDoorAccessApplication implements ApplicationRunner {
      */
     @Scheduled(fixedDelay = 5000)
     private void getAndSaveAcsWorkStatus() {
-        if (startUp && userId[0] != -1) {
-            hcDoorAccessService.updateAcsWorkData();
+        for (int userId : userIds) {
+            if (userId >= 0) hcDoorAccessService.updateAcsWorkData(userId);
+        }
+    }
+
+    @PreDestroy
+    public void destroy(){
+        hcDoorAccessService.stopAlarmListen();
+        if (alarmChanIds != null){
+            for (int alarmChanId : alarmChanIds) {
+                hikService.closeAlarmChan(alarmChanId);
+            }
+        }
+        if (userIds != null){
+            for (int userId : userIds) {
+                hikService.logout(userId);
+            }
         }
     }
 }

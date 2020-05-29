@@ -9,6 +9,7 @@ import com.sun.jna.Pointer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.Base64;
 import java.util.Calendar;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -19,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 @Component("fmsgCallBackV31")
 public class MyFMSGCallBackV31 implements HCNetSDK.FMSGCallBack_V31 {
 
-    @Autowired
+    @Resource
     private IEventInfoService eventInfoService;
 
     private static ExecutorService executorService = new ThreadPoolExecutor(2, 2, 0, TimeUnit.SECONDS,
