@@ -30,7 +30,7 @@ public class HcVideoApplication implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
-        List<HcNetDeviceConfig.DeviceInfo> videos = hcNetDeviceConfig.getVideos();
+        List<HcNetDeviceConfig.VideoInfo> videos = hcNetDeviceConfig.getVideos();
         if (videos == null) return;
         userIds = new int[videos.size()];
         alarmChanIds = new int[videos.size()];

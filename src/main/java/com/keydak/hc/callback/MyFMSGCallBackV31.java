@@ -1,9 +1,14 @@
 package com.keydak.hc.callback;
 
+import com.keydak.hc.config.HcNetDeviceConfig;
+import com.keydak.hc.config.SmsConfig;
 import com.keydak.hc.core.HCNetSDK;
+import com.keydak.hc.entity.DcimAlarmInfo;
 import com.keydak.hc.entity.EventInfo;
 import com.keydak.hc.enums.HikVcaEventEnum;
+import com.keydak.hc.service.IDcimAlarmInfoService;
 import com.keydak.hc.service.IEventInfoService;
+import com.keydak.hc.service.ISmtService;
 import com.keydak.hc.util.HexUtil;
 import com.sun.jna.Pointer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +17,8 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.util.Base64;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -22,6 +29,15 @@ public class MyFMSGCallBackV31 implements HCNetSDK.FMSGCallBack_V31 {
 
     @Resource
     private IEventInfoService eventInfoService;
+    @Resource
+    private IDcimAlarmInfoService dcimAlarmInfoService;
+    @Resource
+    private HcNetDeviceConfig hcNetDeviceConfig;
+    @Resource
+    private SmsConfig smsConfig;
+
+    @Resource
+    private ISmtService smt120Service;
 
     private static ExecutorService executorService = new ThreadPoolExecutor(2, 2, 0, TimeUnit.SECONDS,
             new ArrayBlockingQueue<>(512), // 使用有界队列，避免OOM
@@ -36,8 +52,31 @@ public class MyFMSGCallBackV31 implements HCNetSDK.FMSGCallBack_V31 {
                 Pointer pInfoV40 = alarmInfo.getPointer();
                 pInfoV40.write(0, pAlarmInfo.getByteArray(0, alarmInfo.size()), 0, alarmInfo.size());
                 alarmInfo.read();
-                int dwEventType = alarmInfo.struRuleInfo.dwEventType;
-                System.out.println(HikVcaEventEnum.getMessage(dwEventType));
+                int dwEventType = alarmInfo.struRuleInfo.wEventTypeEx;
+                if (HikVcaEventEnum.INTRUSION == HikVcaEventEnum.get(dwEventType)) {
+                    byte[] sIpV4 = alarmInfo.struDevInfo.struDevIP.sIpV4;
+                    StringBuilder stringBuffer = new StringBuilder();
+                    for (byte b : sIpV4) {
+                        stringBuffer.append(b).append(".");
+                    }
+                    stringBuffer.deleteCharAt(stringBuffer.length()-1);
+                    short wPort = alarmInfo.struDevInfo.wPort;
+                    HcNetDeviceConfig.VideoInfo videoInfo = hcNetDeviceConfig.getVideos(stringBuffer.toString(), String.valueOf(wPort));
+                    // database
+                    DcimAlarmInfo dcimAlarmInfo = new DcimAlarmInfo();
+                    dcimAlarmInfo.setId(UUID.randomUUID().toString());
+                    dcimAlarmInfo.setEventId(0);
+                    dcimAlarmInfo.setDeviceId(videoInfo.getDeviceIp());
+                    dcimAlarmInfo.setDeviceName(videoInfo.getName());
+                    dcimAlarmInfo.setDetailStore("");
+                    dcimAlarmInfo.setAlarmTime(new Date());
+                    dcimAlarmInfo.setAlarmInfo(videoInfo.getAlarmInfo());
+                    dcimAlarmInfoService.save(dcimAlarmInfo);
+                    // email
+                    for (String number : smsConfig.getNumberArray()) {
+                        smt120Service.sendSMS(smsConfig.getHost(), Integer.parseInt(smsConfig.getPort()), number, dcimAlarmInfo.getAlarmContent());
+                    }
+                }
                 break;
             case HCNetSDK.COMM_ALARM_ACS:
                 HCNetSDK.NET_DVR_ACS_ALARM_INFO strACSInfo = new HCNetSDK.NET_DVR_ACS_ALARM_INFO();

@@ -1,14 +1,24 @@
 hik:
   doors:
-    - deviceIp: 192.168.7.136
-      port: 6001
-      userName: admin
-      password: admin
+#    - deviceIp: 192.168.7.136
+#      port: 6001
+#      userName: admin
+#      password: admin
+#      name: abc
   videos:
     - deviceIp: 192.168.7.180
       port: 8000
       userName: admin
       password: keydak123
+      name: 摄像头
+      alarmInfo:
+        name: name
+        type: 3
+        typeDescription: 安全
+        level: 2
+        levelDescription: 告警
+        content: 区域入侵告警
+        shortContent: 区域入侵告警
 server:
   port: 8780
   servlet:
@@ -19,17 +29,33 @@ logging:
   level:
     root: info
 spring:
+#  mysql
+#  jpa:
+#    show-sql: true
+#    database: mysql
+#    hibernate:
+#      ddl-auto: update
+#    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+#  sqlserver
   jpa:
     show-sql: true
-    database: mysql
+    database: sql_server
     hibernate:
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
       ddl-auto: update
-    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    database-platform: org.hibernate.dialect.SQLServer2008Dialect
+#  datasource:
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#    url: jdbc:mysql://192.168.7.136:3307/monitor_dev_hk?useUnicode=true&characterEncoding=utf8&serverTimezone=GMT%2B8
+#    username: root
+#    password: root
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://192.168.7.136:3307/monitor_dev_hk?useUnicode=true&characterEncoding=utf8&serverTimezone=GMT%2B8
-    username: root
-    password: root
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+    # url: jdbc:mysql://192.168.0.78:3306/weigeng?useUnicode=true&characterEncoding=utf8&serverTimezone=GMT%2B8
+    url: jdbc:sqlserver://192.168.0.78:1433;Databasename=weigeng
+    username: dcimData
+    password: 1qaz@WSX
     type: com.zaxxer.hikari.HikariDataSource
     hikari:
       auto-commit: true
@@ -37,3 +63,9 @@ spring:
       idle-timeout: 600000
       max-lifetime: 1800000
       maximum-pool-size: 10
+sms:
+  host: 192.168.1.140
+  port: 1985
+  numberArray:
+    - 98765432100
+    - 12345678900

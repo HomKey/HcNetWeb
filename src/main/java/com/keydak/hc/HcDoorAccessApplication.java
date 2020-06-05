@@ -67,6 +67,7 @@ public class HcDoorAccessApplication implements ApplicationRunner {
      */
     @Scheduled(fixedDelay = 5000)
     private void getAndSaveAcsWorkStatus() {
+        if (userIds == null) return;
         for (int userId : userIds) {
             if (userId >= 0) hcDoorAccessService.updateAcsWorkData(userId);
         }

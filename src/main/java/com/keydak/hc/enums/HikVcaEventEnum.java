@@ -1,35 +1,46 @@
 package com.keydak.hc.enums;
 
 public enum HikVcaEventEnum {
-    VCA_TRAVERSE_PLANE(0x1,"穿越警戒面"),
-    VCA_ENTER_AREA(0x2,"目标进入区域"),
-    VCA_EXIT_AREA(0x4,"目标离开区域"),
-    VCA_INTRUSION(0x8,"周界入侵"),
-    VCA_LOITER(0x10,"徘徊"),
-    VCA_LEFT_TAKE(0x20,"丢包捡包"),
-    VCA_PARKING(0x40,"停车"),
-    VCA_RUN(0x80,"奔跑"),
-    VCA_HIGH_DENSITY(0x100,"区域内人员密度"),
-    VCA_VIOLENT_MOTION(0x200,"剧烈运动检测"),
-    VCA_REACH_HIGHT(0x400,"攀高检测"),
-    VCA_GET_UP(0x800,"起身检测"),
-    VCA_LEFT(0x1000,"丢包"),
-    VCA_TAKE(0x2000,"捡包"),
-    VCA_LEAVE_POSITION(0x4000,"离岗"),
-    VCA_TRAIL(0x8000,"尾随"),
-    VCA_KEY_PERSON_GET_UP(0x10000,"重点人员起身检测"),
-    VCA_STANDUP(0x20000,"起立检测"),
-    VCA_FALL_DOWN(0x80000,"倒地检测"),
-    VCA_AUDIO_ABNORMAL(0x100000,"声强突变检测"),
-    VCA_ADV_REACH_HEIGHT(0x200000,"折线攀高"),
-    VCA_TOILET_TARRY(0x400000,"如厕超时"),
-    VCA_YARD_TARRY(0x800000,"放风场滞留"),
-    VCA_ADV_TRAVERSE_PLANE(0x1000000,"折线警戒面"),
-    VCA_HUMAN_ENTER(0x10000000,"人靠近ATM（仅在ATM_PANEL模式下支持）"),
-    VCA_OVER_TIME(0x20000000,"操作超时（仅在ATM_PANEL模式下支持）"),
-    VCA_STICK_UP(0x40000000,"贴纸条,支持区域规则"),
-    VCA_INSTALL_SCANNER(0x80000000,"安装读卡器,支持区域规则")
+    TRAVERSE_PLANE(1, "穿越警戒面（越界侦测）"),
+    ENTER_AREA(2, "目标进入区域，支持区域规则"),
+    EXIT_AREA(3, "目标离开区域，支持区域规则"),
+    INTRUSION(4, "周界入侵（区域入侵侦测），支持区域规则"),
+    LOITER(5, "徘徊，支持区域规则"),
+    LEFT_TAKE(6, "丢包捡包，支持区域规则"),
+    PARKING(7, "停车，支持区域规则"),
+    RUN(8, "快速移动(奔跑)，支持区域规则"),
+    HIGH_DENSITY(9, "区域内人员密度，支持区域规则，人员聚集度超过设置的阈值时设备上传报警信息"),
+    VIOLENT_MOTION(10, "剧烈运动检测"),
+    REACH_HIGHT(11, "攀高检测"),
+    GET_UP(12, "起身检测"),
+    LEFT(13, "物品遗留"),
+    TAKE(14, "物品拿取"),
+    LEAVE_POSITION(15, "离岗"),
+    TRAIL(16, "尾随"),
+    KEY_PERSON_GET_UP(17, "重点人员起身检测"),
+    STANDUP(18, "起立检测"),
+    FALL_DOWN(20, "倒地检测"),
+    AUDIO_ABNORMAL(21, "声强突变检测"),
+    ADV_REACH_HEIGHT(22, "折线攀高"),
+    TOILET_TARRY(23, "如厕超时"),
+    YARD_TARRY(24, "放风场滞留"),
+    ADV_TRAVERSE_PLANE(25, "折线警戒面"),
+    LECTURE(26, "授课(文教)"),
+    ANSWER(27, "回答问题(文教)"),
+    HUMAN_ENTER(29, "人靠近ATM（仅在ATM_PANEL模式下支持）"),
+    OVER_TIME(30, "操作超时（仅在ATM_PANEL模式下支持）"),
+    STICK_UP(31, "贴纸条,支持区域规则"),
+    INSTALL_SCANNER(32, "安装读卡器,支持区域规则"),
+    PEOPLCHANGE(35, "人数变化事件"),
+    SPACING_CHANGE(36, "间距变化事件"),
+    COMBINED_RULE(37, "组合规则事件"),
+    SIT_QUIETLY(38, "一动不动（静坐）事件"),
+    HIGH_DENSITY_STATUS(39, "区域内人员聚集状态，设备按照设置的时间间隔上传实时的人员聚集状态信息，该时间间隔不支持通过SDK配置，需要通过服务器的配置文件来修改，默认：10s"),
+    RUNNING(40, "奔跑检测"),
+    RETENTION(41, "滞留检测"),
+    BLACKBOARD_WRITE(42, "板书"),
     ;
+
     private int value;
     private String message;
 
@@ -38,11 +49,17 @@ public enum HikVcaEventEnum {
         this.message = message;
     }
 
+
     public static String getMessage(int value){
         for (HikVcaEventEnum e : HikVcaEventEnum.values()) {
             if (e.value == value) return e.message;
         }
         return "";
     }
-    //    enum _VCA_EVENT_TYPE_{  }VCA_EVENT_TYPE
+    public static HikVcaEventEnum get(int value){
+        for (HikVcaEventEnum e : HikVcaEventEnum.values()) {
+            if (e.value == value) return e;
+        }
+        return null;
+    }
 }
