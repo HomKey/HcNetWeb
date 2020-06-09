@@ -37,9 +37,11 @@ public class HcVideoApplication implements ApplicationRunner {
         for (int i = 0; i < videos.size(); i++) {
             HcNetDeviceConfig.DeviceInfo video = videos.get(i);
             int userId = hikService.login(video.getDeviceIp(), Short.parseShort(video.getPort()), video.getUserName(), video.getPassword());
+            logger.info(userId);
             if (userId == -1) {
                 logger.error("注册失败");
             } else {
+                logger.info("注册成功");
                 userIds[i] = userId;
                 alarmChanIds[i] = hikService.setUpAlarmChan(userIds[i], HikSetUpAlarmEnum.Level.MIDDLE, HikSetUpAlarmEnum.AlarmInfoType.NEW,HikSetUpAlarmEnum.DeployType.REALTIME);
             }

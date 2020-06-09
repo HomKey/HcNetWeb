@@ -40,6 +40,7 @@ public class HcNetDeviceConfig {
     }
 
     public static class DeviceInfo {
+        private String deviceId;
         private String deviceIp;
         private String port;
         private String userName;
@@ -85,16 +86,24 @@ public class HcNetDeviceConfig {
         public void setPassword(String password) {
             this.password = password;
         }
+
+        public String getDeviceId() {
+            return deviceId;
+        }
+
+        public void setDeviceId(String deviceId) {
+            this.deviceId = deviceId;
+        }
     }
 
     public static class AlarmInfo{
-        private String name;
-        private Integer type;
-        private String typeDescription;
-        private Integer level;
-        private String levelDescription;
-        private String content;
-        private String shortContent;
+        private String name = "区域入侵告警";
+        private Integer type = 3;
+        private String typeDescription = "安全";
+        private Integer level = 2;
+        private String levelDescription = "告警";
+        private String content = "区域入侵告警";
+        private String shortContent = "区域入侵告警";
 
         public String getName() {
             return name;

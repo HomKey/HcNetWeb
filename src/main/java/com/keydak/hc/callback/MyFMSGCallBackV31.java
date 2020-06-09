@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Calendar;
 import java.util.Date;
@@ -45,6 +47,7 @@ public class MyFMSGCallBackV31 implements HCNetSDK.FMSGCallBack_V31 {
 
     @Override
     public boolean invoke(int lCommand, HCNetSDK.NET_DVR_ALARMER pAlarmer, Pointer pAlarmInfo, int dwBufLen, Pointer pUser) {
+        System.out.println(lCommand);
         switch (lCommand) {
             case HCNetSDK.COMM_ALARM_RULE:
                 HCNetSDK.NET_VCA_RULE_ALARM alarmInfo = new HCNetSDK.NET_VCA_RULE_ALARM();
@@ -55,22 +58,25 @@ public class MyFMSGCallBackV31 implements HCNetSDK.FMSGCallBack_V31 {
                 int dwEventType = alarmInfo.struRuleInfo.wEventTypeEx;
                 if (HikVcaEventEnum.INTRUSION == HikVcaEventEnum.get(dwEventType)) {
                     byte[] sIpV4 = alarmInfo.struDevInfo.struDevIP.sIpV4;
-                    StringBuilder stringBuffer = new StringBuilder();
-                    for (byte b : sIpV4) {
-                        stringBuffer.append(b).append(".");
-                    }
-                    stringBuffer.deleteCharAt(stringBuffer.length()-1);
+                    String deviceIp = new String(sIpV4, StandardCharsets.UTF_8).trim();
                     short wPort = alarmInfo.struDevInfo.wPort;
-                    HcNetDeviceConfig.VideoInfo videoInfo = hcNetDeviceConfig.getVideos(stringBuffer.toString(), String.valueOf(wPort));
+                    HcNetDeviceConfig.VideoInfo videoInfo = hcNetDeviceConfig.getVideos(deviceIp, String.valueOf(wPort));
+                    if (videoInfo == null){
+                        videoInfo = new HcNetDeviceConfig.VideoInfo();
+                        videoInfo.setDeviceIp("未知");
+                        videoInfo.setName("未知");
+                        videoInfo.setAlarmInfo(new HcNetDeviceConfig.AlarmInfo());
+                    }
                     // database
                     DcimAlarmInfo dcimAlarmInfo = new DcimAlarmInfo();
                     dcimAlarmInfo.setId(UUID.randomUUID().toString());
                     dcimAlarmInfo.setEventId(0);
-                    dcimAlarmInfo.setDeviceId(videoInfo.getDeviceIp());
+                    dcimAlarmInfo.setDeviceId(videoInfo.getDeviceId());
                     dcimAlarmInfo.setDeviceName(videoInfo.getName());
                     dcimAlarmInfo.setDetailStore("");
                     dcimAlarmInfo.setAlarmTime(new Date());
                     dcimAlarmInfo.setAlarmInfo(videoInfo.getAlarmInfo());
+                    System.out.println("save alarmInfo");
                     dcimAlarmInfoService.save(dcimAlarmInfo);
                     // email
                     for (String number : smsConfig.getNumberArray()) {

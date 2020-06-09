@@ -11,7 +11,7 @@
 	<groupId>com.keydak.hc</groupId>
 	<artifactId>HcNet</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>war</packaging>
+	<packaging>jar</packaging>
 	<name>hc</name>
 	<description>HCNet for Spring Boot</description>
 
@@ -25,12 +25,6 @@
 			<artifactId>commons-net</artifactId>
 			<version>3.3</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/com.google.code.gson/gson -->
-		<dependency>
-			<groupId>com.google.code.gson</groupId>
-			<artifactId>gson</artifactId>
-			<version>2.8.6</version>
-		</dependency>
 		<dependency>
 			<groupId>com.microsoft.sqlserver</groupId>
 			<artifactId>mssql-jdbc</artifactId>
@@ -41,14 +35,14 @@
 			<artifactId>jna-sdk</artifactId>
 			<version>1.0.0</version>
 			<scope>system</scope>
-			<systemPath>${pom.basedir}/src/main/resources/lib/jna.jar</systemPath>
+			<systemPath>${project.basedir}/src/main/resources/lib/jna.jar</systemPath>
 		</dependency>
 		<dependency>
 			<groupId>com.sun.jna</groupId>
 			<artifactId>examples-sdk</artifactId>
 			<version>1.0.0</version>
 			<scope>system</scope>
-			<systemPath>${pom.basedir}/src/main/resources/lib/examples.jar</systemPath>
+			<systemPath>${project.basedir}/src/main/resources/lib/examples.jar</systemPath>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -58,16 +52,26 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
+<!--			<exclusions>-->
+<!--				<exclusion>-->
+<!--					<groupId>org.springframework.boot</groupId>-->
+<!--					<artifactId>spring-boot-starter-tomcat</artifactId>-->
+<!--				</exclusion>-->
+<!--			</exclusions>-->
 		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>org.springframework.boot</groupId>-->
+<!--			<artifactId>spring-boot-starter-tomcat</artifactId>-->
+<!--		</dependency>-->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<scope>runtime</scope>
-		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>mysql</groupId>-->
+<!--			<artifactId>mysql-connector-java</artifactId>-->
+<!--			<scope>runtime</scope>-->
+<!--		</dependency>-->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
@@ -86,9 +90,18 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-<!--				<configuration>-->
-<!--					<includeSystemScope>true</includeSystemScope>-->
-<!--				</configuration>-->
+				<configuration>
+					<includeSystemScope>true</includeSystemScope>
+				</configuration>
+			</plugin>
+			<!--添加配置跳过测试-->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.22.1</version>
+				<configuration>
+					<skipTests>true</skipTests>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

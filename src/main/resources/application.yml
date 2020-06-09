@@ -6,7 +6,8 @@ hik:
 #      password: admin
 #      name: abc
   videos:
-    - deviceIp: 192.168.7.180
+    - deviceId: 516E02C2-1635-4783-B0C4-EEEF59C8992E
+      deviceIp: 192.168.7.180
       port: 8000
       userName: admin
       password: keydak123
@@ -65,7 +66,7 @@ spring:
       maximum-pool-size: 10
 sms:
   host: 192.168.1.140
-  port: 1985
+  port: 23
   numberArray:
     - 98765432100
     - 12345678900
