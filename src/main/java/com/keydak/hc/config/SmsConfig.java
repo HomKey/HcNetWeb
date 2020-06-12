@@ -35,4 +35,5 @@ public class SmsConfig {
     public void setNumberArray(String[] numberArray) {
         this.numberArray = numberArray;
     }
+
 }

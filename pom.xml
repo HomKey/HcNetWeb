@@ -11,7 +11,7 @@
 	<groupId>com.keydak.hc</groupId>
 	<artifactId>HcNet</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>jar</packaging>
+	<packaging>war</packaging>
 	<name>hc</name>
 	<description>HCNet for Spring Boot</description>
 

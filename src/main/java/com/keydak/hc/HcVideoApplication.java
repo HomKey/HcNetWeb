@@ -1,6 +1,7 @@
 package com.keydak.hc;
 
 import com.keydak.hc.config.HcNetDeviceConfig;
+import com.keydak.hc.core.HCNetSDK;
 import com.keydak.hc.enums.HikSetUpAlarmEnum;
 import com.keydak.hc.service.IHikService;
 import org.apache.logging.log4j.LogManager;
@@ -39,7 +40,8 @@ public class HcVideoApplication implements ApplicationRunner {
             int userId = hikService.login(video.getDeviceIp(), Short.parseShort(video.getPort()), video.getUserName(), video.getPassword());
             logger.info(userId);
             if (userId == -1) {
-                logger.error("注册失败");
+                logger.info(video.getUserName() + ":" + video.getPassword());
+                logger.error("注册失败，错误号:" + HCNetSDK.INSTANCE.NET_DVR_GetLastError());
             } else {
                 logger.info("注册成功");
                 userIds[i] = userId;

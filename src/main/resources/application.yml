@@ -20,6 +20,34 @@ hik:
         levelDescription: 告警
         content: 区域入侵告警
         shortContent: 区域入侵告警
+    - deviceId: D4B3004B-46D1-4FB9-9862-EDDEF59E02D7
+      deviceIp: 192.168.170.26
+      port: 8000
+      userName: admin
+      password: Xxk3113033@qyry.top
+      name: 摄像头
+      alarmInfo:
+        name: name
+        type: 3
+        typeDescription: 安全
+        level: 2
+        levelDescription: 告警
+        content: 区域入侵告警
+        shortContent: 区域入侵告警
+    - deviceId: 67BECBD5-1064-49FE-8CD4-64881042BD5B
+      deviceIp: 192.168.170.27
+      port: 8000
+      userName: admin
+      password: Xxk3113033@qyry.top
+      name: 摄像头
+      alarmInfo:
+        name: name
+        type: 3
+        typeDescription: 安全
+        level: 2
+        levelDescription: 告警
+        content: 区域入侵告警
+        shortContent: 区域入侵告警
 server:
   port: 8780
   servlet:
@@ -68,5 +96,7 @@ sms:
   host: 192.168.1.140
   port: 23
   numberArray:
-    - 98765432100
-    - 12345678900
+    - 13790327230
+    - 18107535120
+    - 13791327230
+holiday: true

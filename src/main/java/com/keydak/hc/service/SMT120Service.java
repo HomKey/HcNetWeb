@@ -1,12 +1,28 @@
 package com.keydak.hc.service;
 
+import com.keydak.hc.callback.MyFMSGCallBackV31;
+import com.keydak.hc.config.SmsConfig;
+import com.keydak.hc.dto.SmsData;
 import org.apache.commons.net.telnet.TelnetClient;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.SocketException;
+import java.util.Calendar;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Stack;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * User: vk
@@ -15,54 +31,123 @@ import java.io.UnsupportedEncodingException;
  * Description:
  */
 @Service("smt120Service")
-public class SMT120Service implements ISmtService{
+public class SMT120Service implements ISmtService {
+    private static final Logger logger = LogManager.getLogger(SMT120Service.class);
     private static String WORD_FORMAT = "send_sms(\"%s\",\"%s\")";
     private static String VOICE_FORMAT = "rf_call(\"%s\",\"%s\")";
     private final String prompt = ">"; //结束标识字符串,Windows中是>,Linux中是#
     private final char promptChar = '>';   //结束标识字符
+    private TelnetClient telnetClient;
+
+    public static Queue<SmsData> data = new LinkedList<>();
+
+    @Resource
+    private SmsConfig smsConfig;
+
+
+
+    @Value("${holiday}")
+    private Boolean holiday;
+
+    @PostConstruct
+    public void connect() {
+//        logger.info("connect");
+//        if (telnetClient == null){
+//            telnetClient = new TelnetClient();
+//            telnetClient.setDefaultTimeout(5000); //socket延迟时间：5000ms
+//        }
+//        try{
+//            telnetClient.connect(smsConfig.getHost(), Integer.parseInt(smsConfig.getPort()));  //建立一个连接,默认端口是23
+//            Thread.sleep(2000);
+//        } catch (Exception e){
+//            e.printStackTrace();
+//            logger.info("connect exception");
+//        }
+//        logger.info("connect end");
+    }
+
+    @Scheduled(fixedDelay = 10000)
+    public void scheduled2() {
+        if (!data.isEmpty()) {
+            SmsData item = data.poll();
+            sendSMS(item.getNumber(), item.getContent());
+        }
+    }
+//    @PreDestroy
+//    public void telNetDestroy(){
+//        if (telnetClient != null){
+//            try {
+//                telnetClient.disconnect();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//    }
 
     @Override
-    public void sendSMS(String host, int port, String number, String content){
-        send(host,port,getSMTSmsMessage(number, content));
-    }
-    @Override
-    public void sendVoice(String host, int port, String number, String content){
-        send(host,port,getSMTVoiceMessage(number, content));
+    public boolean sendSMS(String number, String content) {
+        logger.info("sendSMS:" + number + "(" + content + ")");
+        return send(getSMTSmsMessage(number, content));
     }
 
-    private void send(String host, int port, byte[] data) {
-        TelnetClient telnetClient = new TelnetClient();
-        telnetClient.setDefaultTimeout(5000); //socket延迟时间：5000ms
+    @Override
+    public boolean sendVoice(String number, String content) {
+        logger.info("sendVoice:" + number + "(" + content + ")");
+        return send(getSMTVoiceMessage(number, content));
+    }
+
+    private boolean send(byte[] data) {
+        AtomicBoolean result = new AtomicBoolean(false);
+        logger.info("send");
+//        int count = 5;
+//        boolean isConnect;
+//        do{
+//            isConnect = telnetClient.isConnected();
+//            logger.info("isConnect:" + isConnect);
+//            if (!isConnect){
+//                connect();
+//            }
+//            count--;
+//        }while (!isConnect && count >= 0);
+//        if (!isConnect) {
+//            return result.get();
+//        }
         OutputStream out = null;
         InputStream in = null;
+        TelnetClient telnetClient = null;
         try {
-            telnetClient.connect(host, port);  //建立一个连接,默认端口是23
-            out = telnetClient.getOutputStream();  //写命令的流
-            in = telnetClient.getInputStream();
-            out.write(data); //写命令
-            out.write('\r');
-            out.write('\n');
-            out.flush(); //将命令发送到telnet Server
-            String result = readUntil(in, prompt);
-            telnetClient.disconnect();
-        } catch (IOException e) {
+            telnetClient = new TelnetClient();
+            telnetClient.setDefaultTimeout(5000); //socket延迟时间：5000ms
+            telnetClient.connect(smsConfig.getHost(), Integer.parseInt(smsConfig.getPort()));  //建立一个连接,默认端口是23
+            Thread.sleep(2000);
+//            int retry = 3;
+//            boolean isSuccess;
+//            do {
+//                isSuccess = true;
+                out = telnetClient.getOutputStream();  //写命令的流
+                in = telnetClient.getInputStream();
+                out.write(data); //写命令
+                out.write('\r');
+                out.write('\n');
+                out.flush(); //将命令发送到telnet Server
+                String receiveStr = readUntil(in, prompt);
+                logger.info(receiveStr);
+//                Thread.sleep(5000);
+//            } while (!isSuccess && retry > 0);
+            result.set(true);
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
+            result.set(false);
         } finally {
-            if (null != out) {
+            if (telnetClient != null) {
                 try {
-                    out.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (null != in) {
-                try {
-                    in.close();
+                    telnetClient.disconnect();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
         }
+        return result.get();
     }
 
     /**
@@ -99,6 +184,7 @@ public class SMT120Service implements ISmtService{
                 }
             }
         } catch (Exception e) {
+            System.out.println("abssss");
             e.printStackTrace();
         }
         return sb.toString();

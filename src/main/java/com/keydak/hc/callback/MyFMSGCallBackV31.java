@@ -1,43 +1,51 @@
 package com.keydak.hc.callback;
 
+import com.keydak.hc.HcVideoApplication;
 import com.keydak.hc.config.HcNetDeviceConfig;
 import com.keydak.hc.config.SmsConfig;
 import com.keydak.hc.core.HCNetSDK;
+import com.keydak.hc.dto.SmsData;
 import com.keydak.hc.entity.DcimAlarmInfo;
 import com.keydak.hc.entity.EventInfo;
 import com.keydak.hc.enums.HikVcaEventEnum;
 import com.keydak.hc.service.IDcimAlarmInfoService;
 import com.keydak.hc.service.IEventInfoService;
 import com.keydak.hc.service.ISmtService;
+import com.keydak.hc.service.SMT120Service;
 import com.keydak.hc.util.HexUtil;
 import com.sun.jna.Pointer;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.UUID;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Component("fmsgCallBackV31")
 public class MyFMSGCallBackV31 implements HCNetSDK.FMSGCallBack_V31 {
-
     @Resource
     private IEventInfoService eventInfoService;
     @Resource
     private IDcimAlarmInfoService dcimAlarmInfoService;
     @Resource
     private HcNetDeviceConfig hcNetDeviceConfig;
+
+    @Value("${holiday}")
+    private Boolean holiday;
+
     @Resource
     private SmsConfig smsConfig;
-
     @Resource
     private ISmtService smt120Service;
 
@@ -50,37 +58,46 @@ public class MyFMSGCallBackV31 implements HCNetSDK.FMSGCallBack_V31 {
         System.out.println(lCommand);
         switch (lCommand) {
             case HCNetSDK.COMM_ALARM_RULE:
-                HCNetSDK.NET_VCA_RULE_ALARM alarmInfo = new HCNetSDK.NET_VCA_RULE_ALARM();
-                alarmInfo.write();
-                Pointer pInfoV40 = alarmInfo.getPointer();
-                pInfoV40.write(0, pAlarmInfo.getByteArray(0, alarmInfo.size()), 0, alarmInfo.size());
-                alarmInfo.read();
-                int dwEventType = alarmInfo.struRuleInfo.wEventTypeEx;
-                if (HikVcaEventEnum.INTRUSION == HikVcaEventEnum.get(dwEventType)) {
-                    byte[] sIpV4 = alarmInfo.struDevInfo.struDevIP.sIpV4;
-                    String deviceIp = new String(sIpV4, StandardCharsets.UTF_8).trim();
-                    short wPort = alarmInfo.struDevInfo.wPort;
-                    HcNetDeviceConfig.VideoInfo videoInfo = hcNetDeviceConfig.getVideos(deviceIp, String.valueOf(wPort));
-                    if (videoInfo == null){
-                        videoInfo = new HcNetDeviceConfig.VideoInfo();
-                        videoInfo.setDeviceIp("未知");
-                        videoInfo.setName("未知");
-                        videoInfo.setAlarmInfo(new HcNetDeviceConfig.AlarmInfo());
-                    }
-                    // database
-                    DcimAlarmInfo dcimAlarmInfo = new DcimAlarmInfo();
-                    dcimAlarmInfo.setId(UUID.randomUUID().toString());
-                    dcimAlarmInfo.setEventId(0);
-                    dcimAlarmInfo.setDeviceId(videoInfo.getDeviceId());
-                    dcimAlarmInfo.setDeviceName(videoInfo.getName());
-                    dcimAlarmInfo.setDetailStore("");
-                    dcimAlarmInfo.setAlarmTime(new Date());
-                    dcimAlarmInfo.setAlarmInfo(videoInfo.getAlarmInfo());
-                    System.out.println("save alarmInfo");
-                    dcimAlarmInfoService.save(dcimAlarmInfo);
-                    // email
-                    for (String number : smsConfig.getNumberArray()) {
-                        smt120Service.sendSMS(smsConfig.getHost(), Integer.parseInt(smsConfig.getPort()), number, dcimAlarmInfo.getAlarmContent());
+                Calendar cal = Calendar.getInstance();
+                int week = cal.get(Calendar.DAY_OF_WEEK);
+                int hour = cal.get(Calendar.HOUR_OF_DAY);
+                int minute = cal.get(Calendar.MINUTE);
+                System.out.println(week + ":" + hour + ":" + minute);
+                if (holiday || week == 1 || week == 7 || (hour < 8
+                        || (hour >= 12 && (hour <= 14 && minute < 30))
+                        || (hour >= 17 && minute > 30))) {
+                    HCNetSDK.NET_VCA_RULE_ALARM alarmInfo = new HCNetSDK.NET_VCA_RULE_ALARM();
+                    alarmInfo.write();
+                    Pointer pInfoV40 = alarmInfo.getPointer();
+                    pInfoV40.write(0, pAlarmInfo.getByteArray(0, alarmInfo.size()), 0, alarmInfo.size());
+                    alarmInfo.read();
+                    int dwEventType = alarmInfo.struRuleInfo.wEventTypeEx;
+                    if (HikVcaEventEnum.INTRUSION == HikVcaEventEnum.get(dwEventType)) {
+                        byte[] sIpV4 = alarmInfo.struDevInfo.struDevIP.sIpV4;
+                        String deviceIp = new String(sIpV4, StandardCharsets.UTF_8).trim();
+                        short wPort = alarmInfo.struDevInfo.wPort;
+                        HcNetDeviceConfig.VideoInfo videoInfo = hcNetDeviceConfig.getVideos(deviceIp, String.valueOf(wPort));
+                        if (videoInfo == null) {
+                            videoInfo = new HcNetDeviceConfig.VideoInfo();
+                            videoInfo.setDeviceIp("未知");
+                            videoInfo.setName("未知");
+                            videoInfo.setAlarmInfo(new HcNetDeviceConfig.AlarmInfo());
+                        }
+                        // database
+                        DcimAlarmInfo dcimAlarmInfo = new DcimAlarmInfo();
+                        dcimAlarmInfo.setId(UUID.randomUUID().toString());
+                        dcimAlarmInfo.setEventId(0);
+                        dcimAlarmInfo.setDeviceId(videoInfo.getDeviceId());
+                        dcimAlarmInfo.setDeviceName(videoInfo.getName());
+                        dcimAlarmInfo.setDetailStore("");
+                        dcimAlarmInfo.setAlarmTime(new Date());
+                        dcimAlarmInfo.setAlarmInfo(videoInfo.getAlarmInfo());
+                        System.out.println("save alarmInfo");
+                        dcimAlarmInfoService.save(dcimAlarmInfo);
+                        // sms
+                        for (String number : smsConfig.getNumberArray()) {
+                            SMT120Service.data.add(new SmsData(number, dcimAlarmInfo.getAlarmContent()));
+                        }
                     }
                 }
                 break;
