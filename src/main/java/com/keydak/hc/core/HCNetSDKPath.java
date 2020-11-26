@@ -18,7 +18,9 @@ public class HCNetSDKPath {
                 .replaceAll("%20"," ")
                 .substring(6)
                 .replace("/","\\");
+
         path = "D:\\lib\\";
+        path = "/home/pi/wsp/hcnet/";
         System.out.println("path:" + path);
         try {
             DLL_PATH = java.net.URLDecoder.decode(path, "utf-8");

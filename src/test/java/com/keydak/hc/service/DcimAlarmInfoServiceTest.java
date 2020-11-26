@@ -24,17 +24,5 @@ class DcimAlarmInfoServiceTest {
 
     @Test
     void save() {
-        List<HcNetDeviceConfig.VideoInfo> videos = hcNetDeviceConfig.getVideos();
-        for (HcNetDeviceConfig.VideoInfo videoInfo :
-                videos) {
-            DcimAlarmInfo dcimAlarmInfo = new DcimAlarmInfo();
-            dcimAlarmInfo.setId(UUID.randomUUID().toString());
-            dcimAlarmInfo.setDeviceId(videoInfo.getDeviceIp());
-            dcimAlarmInfo.setDeviceName(videoInfo.getName());
-            dcimAlarmInfo.setAlarmTime(new Date());
-            dcimAlarmInfo.setDetailStore("");
-            dcimAlarmInfo.setAlarmInfo(videoInfo.getAlarmInfo());
-            dcimAlarmInfoService.save(dcimAlarmInfo);
-        }
     }
 }

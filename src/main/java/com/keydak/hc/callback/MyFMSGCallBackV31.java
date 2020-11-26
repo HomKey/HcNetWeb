@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
-@Component("fmsgCallBackV31")
+//@Component("fmsgCallBackV31")
 public class MyFMSGCallBackV31 implements HCNetSDK.FMSGCallBack_V31 {
     @Resource
     private IEventInfoService eventInfoService;
@@ -156,5 +156,11 @@ public class MyFMSGCallBackV31 implements HCNetSDK.FMSGCallBack_V31 {
                 break;
         }
         return true;
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        System.out.println("callbackv31 finalize");
+        super.finalize();
     }
 }

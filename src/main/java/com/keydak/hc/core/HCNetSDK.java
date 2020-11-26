@@ -31,7 +31,7 @@ import java.util.List;
 //SDK接口说明,HCNetSDK.dll
 public interface HCNetSDK extends StdCallLibrary {
 
-    HCNetSDK INSTANCE = (HCNetSDK) Native.loadLibrary(HCNetSDKPath.DLL_PATH + "HCNetSDK", HCNetSDK.class);
+    HCNetSDK INSTANCE = (HCNetSDK) Native.loadLibrary(HCNetSDKPath.DLL_PATH + "hcnetsdk", HCNetSDK.class);
 
     /***宏定义***/
     //常量
