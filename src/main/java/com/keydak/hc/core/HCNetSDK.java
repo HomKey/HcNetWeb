@@ -1,37 +1,26 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/*
- * HCNetSDK.java
- *
- * Created on 2009-9-14, 19:31:34
- */
-
 package com.keydak.hc.core;
 
+import com.sun.jna.Callback;
+import com.sun.jna.Library;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.Structure;
 import com.sun.jna.Union;
-import com.sun.jna.examples.win32.GDI32.RECT;
 import com.sun.jna.examples.win32.W32API;
 import com.sun.jna.examples.win32.W32API.HWND;
 import com.sun.jna.ptr.ByteByReference;
-import com.sun.jna.win32.StdCallLibrary;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.ShortByReference;
+import com.sun.jna.win32.StdCallLibrary;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 //SDK接口说明,HCNetSDK.dll
-public interface HCNetSDK extends StdCallLibrary {
+public interface HCNetSDK extends Library {
 
-    HCNetSDK INSTANCE = (HCNetSDK) Native.loadLibrary(HCNetSDKPath.DLL_PATH + "hcnetsdk", HCNetSDK.class);
+    HCNetSDK INSTANCE = (HCNetSDK) Native.loadLibrary("hcnetsdk", HCNetSDK.class);
 
     /***宏定义***/
     //常量
@@ -2402,7 +2391,7 @@ public interface HCNetSDK extends StdCallLibrary {
         public int dwMinorType;//次类型 0-全部;
         public byte[] sPanelUser = new byte[MAX_NAMELEN]; //操作面板的用户名
         public byte[] sNetUser = new byte[MAX_NAMELEN];//网络操作的用户名
-        public NET_DVR_IPADDR struRemoteHostAddr;//¿程主机地址
+        public NET_DVR_IPADDR struRemoteHostAddr;//??程主机地址
         public int dwParaType;//参数类型
         public int dwChannel;//通道号
         public int dwDiskNumber;//硬盘号
@@ -3123,9 +3112,9 @@ DVR实现巡航数据结构
         public byte byStartChan;                    //起始通道号,例如DVS-1,DVR - 1
     }
 
-    //NET_DVR_Login_V30()参数结构
-    public static class NET_DVR_DEVICEINFO_V30 extends Structure {
-        public byte[] sSerialNumber = new byte[SERIALNO_LEN];  //序列号
+    public static class NET_DVR_DEVICEINFO_V30 extends Structure
+    {
+        public  byte[] sSerialNumber = new byte[SERIALNO_LEN];  //序列号
         public byte byAlarmInPortNum;    //报警输入个数
         public byte byAlarmOutPortNum;   //报警输出个数
         public byte byDiskNum;           //硬盘个数
@@ -3165,7 +3154,7 @@ DVR实现巡航数据结构
     public static final int NET_DVR_LOGIN_USERNAME_MAX_LEN = 64;
     public static final int NET_DVR_LOGIN_PASSWD_MAX_LEN = 64;
 
-    public static interface FLoginResultCallBack extends StdCallCallback {
+    public static interface FLoginResultCallBack extends Callback {
         public int invoke(int lUserID, int dwResult, NET_DVR_DEVICEINFO_V30 lpDeviceinfo, Pointer pUser);
     }
 
@@ -6613,92 +6602,92 @@ DVR实现巡航数据结构
 
 
     /***API函数声明,详细说明见API手册***/
-    public static interface FRealDataCallBack_V30 extends StdCallCallback {
+    public static interface FRealDataCallBack_V30 extends Callback {
         public void invoke(int lRealHandle, int dwDataType,
                            ByteByReference pBuffer, int dwBufSize, Pointer pUser);
     }
 
-    public static interface FMSGCallBack extends StdCallCallback {
+    public static interface FMSGCallBack extends Callback {
         public void invoke(int lCommand, NET_DVR_ALARMER pAlarmer, Pointer pAlarmInfo, int dwBufLen, Pointer pUser);
     }
 
-    public static interface FMSGCallBack_V31 extends StdCallCallback {
+    public static interface FMSGCallBack_V31 extends Callback {
         public boolean invoke(int lCommand, NET_DVR_ALARMER pAlarmer, Pointer pAlarmInfo, int dwBufLen, Pointer pUser);
     }
 
-    public static interface FMessCallBack extends StdCallCallback {
+    public static interface FMessCallBack extends Callback {
         public boolean invoke(int lCommand, String sDVRIP, String pBuf, int dwBufLen);
     }
 
-    public static interface FMessCallBack_EX extends StdCallCallback {
+    public static interface FMessCallBack_EX extends Callback {
         public boolean invoke(int lCommand, int lUserID, String pBuf, int dwBufLen);
     }
 
-    public static interface FMessCallBack_NEW extends StdCallCallback {
+    public static interface FMessCallBack_NEW extends Callback {
         public boolean invoke(int lCommand, String sDVRIP, String pBuf, int dwBufLen, short dwLinkDVRPort);
     }
 
-    public static interface FMessageCallBack extends StdCallCallback {
+    public static interface FMessageCallBack extends Callback {
         public boolean invoke(int lCommand, String sDVRIP, String pBuf, int dwBufLen, int dwUser);
     }
 
-    public static interface FExceptionCallBack extends StdCallCallback {
+    public static interface FExceptionCallBack extends Callback {
         public void invoke(int dwType, int lUserID, int lHandle, Pointer pUser);
     }
 
-    public static interface FDrawFun extends StdCallCallback {
+    public static interface FDrawFun extends Callback {
         public void invoke(int lRealHandle, W32API.HDC hDc, int dwUser);
     }
 
-    public static interface FStdDataCallBack extends StdCallCallback {
+    public static interface FStdDataCallBack extends Callback {
         public void invoke(int lRealHandle, int dwDataType, ByteByReference pBuffer, int dwBufSize, int dwUser);
     }
 
-    public static interface FPlayDataCallBack extends StdCallCallback {
+    public static interface FPlayDataCallBack extends Callback {
         public void invoke(int lPlayHandle, int dwDataType, ByteByReference pBuffer, int dwBufSize, int dwUser);
     }
 
-    public static interface FVoiceDataCallBack extends StdCallCallback {
+    public static interface FVoiceDataCallBack extends Callback {
         public void invoke(int lVoiceComHandle, String pRecvDataBuffer, int dwBufSize, byte byAudioFlag, int dwUser);
     }
 
-    public static interface FVoiceDataCallBack_V30 extends StdCallCallback {
+    public static interface FVoiceDataCallBack_V30 extends Callback {
         public void invoke(int lVoiceComHandle, String pRecvDataBuffer, int dwBufSize, byte byAudioFlag, Pointer pUser);
     }
 
-    public static interface FVoiceDataCallBack_MR extends StdCallCallback {
+    public static interface FVoiceDataCallBack_MR extends Callback {
         public void invoke(int lVoiceComHandle, String pRecvDataBuffer, int dwBufSize, byte byAudioFlag, int dwUser);
     }
 
-    public static interface FVoiceDataCallBack_MR_V30 extends StdCallCallback {
+    public static interface FVoiceDataCallBack_MR_V30 extends Callback {
         public void invoke(int lVoiceComHandle, String pRecvDataBuffer, int dwBufSize, byte byAudioFlag, String pUser);
     }
 
-    public static interface FVoiceDataCallBack2 extends StdCallCallback {
+    public static interface FVoiceDataCallBack2 extends Callback {
         public void invoke(String pRecvDataBuffer, int dwBufSize, Pointer pUser);
     }
 
-    public static interface FSerialDataCallBack extends StdCallCallback {
+    public static interface FSerialDataCallBack extends Callback {
         public void invoke(int lSerialHandle, String pRecvDataBuffer, int dwBufSize, int dwUser);
     }
 
-    public static interface FRowDataCallBack extends StdCallCallback {
+    public static interface FRowDataCallBack extends Callback {
         public void invoke(int lUserID, String sIPAddr, int lRowAmout, String pRecvDataBuffer, int dwBufSize, int dwUser);
     }
 
-    public static interface FColLocalDataCallBack extends StdCallCallback {
+    public static interface FColLocalDataCallBack extends Callback {
         public void invoke(int lUserID, String sIPAddr, int lColumnAmout, String pRecvDataBuffer, int dwBufSize, int dwUser);
     }
 
-    public static interface FColGlobalDataCallBack extends StdCallCallback {
+    public static interface FColGlobalDataCallBack extends Callback {
         public void invoke(int lUserID, String sIPAddr, int lColumnAmout, String pRecvDataBuffer, int dwBufSize, int dwUser);
     }
 
-    public static interface FJpegdataCallBack extends StdCallCallback {
+    public static interface FJpegdataCallBack extends Callback {
         public int invoke(int lCommand, int lUserID, String sDVRIP, String sJpegName, String pJpegBuf, int dwBufLen, int dwUser);
     }
 
-    public static interface FPostMessageCallBack extends StdCallCallback {
+    public static interface FPostMessageCallBack extends Callback {
         public int invoke(int dwType, int lIndex);
     }
 
@@ -6972,7 +6961,7 @@ DVR实现巡航数据结构
 //透明通道设置
     int NET_DVR_SerialStart(int lUserID, int lSerialPort, FSerialDataCallBack fSerialDataCallBack, int dwUser);
 
-    public static interface FSerialDataCallBack_V40 extends StdCallCallback {
+    public static interface FSerialDataCallBack_V40 extends Callback {
         public void invoke(int lSerialHandle, int lCHannel, byte[] pRecvDataBuffer, int dwBufSize, Pointer pUser);
     }
 
@@ -7253,7 +7242,7 @@ DVR实现巡航数据结构
 
     boolean NET_DVR_ManualSnap(int lUserID, NET_DVR_MANUALSNAP lpInter, NET_DVR_PLATE_RESULT lpOuter);
 
-    public static interface FRemoteConfigCallback extends StdCallCallback {
+    public static interface FRemoteConfigCallback extends Callback {
         public void invoke(int dwType, Pointer lpBuffer, int dwBufLen, Pointer pUserData);
     }
 
@@ -7360,7 +7349,7 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[12];
     }
 
-    public static interface fGPSDataCallback extends StdCallCallback {
+    public static interface fGPSDataCallback extends Callback {
         public void invoke(int nHandle, int dwState, Pointer lpBuffer, int dwBufLen, Pointer pUser);
     }
 
@@ -7368,55 +7357,55 @@ DVR实现巡航数据结构
 }
 
 
-//播放库函数声明,PlayCtrl.dll
-interface PlayCtrl extends StdCallLibrary {
-    PlayCtrl INSTANCE = (PlayCtrl) Native.loadLibrary("../lib/PlayCtrl",
-            PlayCtrl.class);
-
-    public static final int STREAME_REALTIME = 0;
-    public static final int STREAME_FILE = 1;
-
-    boolean PlayM4_GetPort(IntByReference nPort);
-
-    boolean PlayM4_OpenStream(int nPort, ByteByReference pFileHeadBuf, int nSize, int nBufPoolSize);
-
-    boolean PlayM4_InputData(int nPort, ByteByReference pBuf, int nSize);
-
-    boolean PlayM4_CloseStream(int nPort);
-
-    boolean PlayM4_SetStreamOpenMode(int nPort, int nMode);
-
-    boolean PlayM4_Play(int nPort, HWND hWnd);
-
-    boolean PlayM4_Stop(int nPort);
-
-    boolean PlayM4_SetSecretKey(int nPort, int lKeyType, String pSecretKey, int lKeyLen);
-}
-
-//windows gdi接口,gdi32.dll in system32 folder, 在设置遮挡区域,移动侦测区域等情况下使用
-interface GDI32 extends W32API {
-    GDI32 INSTANCE = (GDI32) Native.loadLibrary("gdi32", GDI32.class, DEFAULT_OPTIONS);
-
-    public static final int TRANSPARENT = 1;
-
-    int SetBkMode(HDC hdc, int i);
-
-    HANDLE CreateSolidBrush(int icolor);
-}
-
-//windows user32接口,user32.dll in system32 folder, 在设置遮挡区域,移动侦测区域等情况下使用
-interface USER32 extends W32API {
-
-    USER32 INSTANCE = (USER32) Native.loadLibrary("user32", USER32.class, DEFAULT_OPTIONS);
-
-    public static final int BF_LEFT = 0x0001;
-    public static final int BF_TOP = 0x0002;
-    public static final int BF_RIGHT = 0x0004;
-    public static final int BF_BOTTOM = 0x0008;
-    public static final int BDR_SUNKENOUTER = 0x0002;
-    public static final int BF_RECT = (BF_LEFT | BF_TOP | BF_RIGHT | BF_BOTTOM);
-
-    boolean DrawEdge(HDC hdc, RECT qrc, int edge, int grfFlags);
-
-    int FillRect(HDC hDC, RECT lprc, HANDLE hbr);
-}
+////播放库函数声明,PlayCtrl.dll
+//interface PlayCtrl extends StdCallLibrary {
+//    PlayCtrl INSTANCE = (PlayCtrl) Native.loadLibrary("../lib/PlayCtrl",
+//            PlayCtrl.class);
+//
+//    public static final int STREAME_REALTIME = 0;
+//    public static final int STREAME_FILE = 1;
+//
+//    boolean PlayM4_GetPort(IntByReference nPort);
+//
+//    boolean PlayM4_OpenStream(int nPort, ByteByReference pFileHeadBuf, int nSize, int nBufPoolSize);
+//
+//    boolean PlayM4_InputData(int nPort, ByteByReference pBuf, int nSize);
+//
+//    boolean PlayM4_CloseStream(int nPort);
+//
+//    boolean PlayM4_SetStreamOpenMode(int nPort, int nMode);
+//
+//    boolean PlayM4_Play(int nPort, HWND hWnd);
+//
+//    boolean PlayM4_Stop(int nPort);
+//
+//    boolean PlayM4_SetSecretKey(int nPort, int lKeyType, String pSecretKey, int lKeyLen);
+//}
+//
+////windows gdi接口,gdi32.dll in system32 folder, 在设置遮挡区域,移动侦测区域等情况下使用
+//interface GDI32 extends W32API {
+//    GDI32 INSTANCE = (GDI32) Native.loadLibrary("gdi32", GDI32.class, DEFAULT_OPTIONS);
+//
+//    public static final int TRANSPARENT = 1;
+//
+//    int SetBkMode(HDC hdc, int i);
+//
+//    HANDLE CreateSolidBrush(int icolor);
+//}
+//
+////windows user32接口,user32.dll in system32 folder, 在设置遮挡区域,移动侦测区域等情况下使用
+//interface USER32 extends W32API {
+//
+//    USER32 INSTANCE = (USER32) Native.loadLibrary("user32", USER32.class, DEFAULT_OPTIONS);
+//
+//    public static final int BF_LEFT = 0x0001;
+//    public static final int BF_TOP = 0x0002;
+//    public static final int BF_RIGHT = 0x0004;
+//    public static final int BF_BOTTOM = 0x0008;
+//    public static final int BDR_SUNKENOUTER = 0x0002;
+//    public static final int BF_RECT = (BF_LEFT | BF_TOP | BF_RIGHT | BF_BOTTOM);
+//
+//    boolean DrawEdge(HDC hdc, RECT qrc, int edge, int grfFlags);
+//
+//    int FillRect(HDC hDC, RECT lprc, HANDLE hbr);
+//}

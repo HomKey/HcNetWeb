@@ -6,34 +6,19 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "AlarmData")
-public class DcimAlarmInfo {
-    @Id
-    @Column(name = "Id")
-    private String id;
-    @Column(name = "Name")
+@Table(name = "dcim_alarm_data")
+public class DcimAlarmInfo extends BaseEntity{
     private String name;
-    @Column(name = "EventId")
     private int eventId;
-    @Column(name = "DeviceId")
     private String deviceId;
-    @Column(name = "DeviceName")
     private String deviceName;
-    @Column(name = "AlarmType")
     private int alarmType;
-    @Column(name = "AlarmTypeDescription")
     private String alarmTypeDescription;
-    @Column(name = "AlarmLevel")
     private int alarmLevel;
-    @Column(name = "AlarmLevelDescription")
     private String alarmLevelDescription;
-    @Column(name = "AlarmContent")
     private String alarmContent;
-    @Column(name = "AlarmShortContent")
     private String alarmShortContent;
-    @Column(name = "DetailStore")
     private String detailStore;
-    @Column(name = "AlarmTime")
     private Date alarmTime;
 
     public void setAlarmInfo(HcNetDeviceConfig.AlarmInfo alarmInfo){
@@ -45,13 +30,6 @@ public class DcimAlarmInfo {
         this.alarmLevelDescription = alarmInfo.getLevelDescription();
         this.alarmContent = this.deviceName + ":" + alarmInfo.getContent() + ",时间" + HcNetDeviceConfig.SIMPLE_DATE_FORMAT.format(this.alarmTime) + "";
         this.alarmShortContent = alarmInfo.getShortContent();
-    }
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     public String getName() {

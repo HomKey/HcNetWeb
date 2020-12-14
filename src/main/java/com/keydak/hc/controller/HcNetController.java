@@ -23,16 +23,16 @@ public class HcNetController {
 
     /**
      * 门禁历史记录（读数据库）
-     * @param page
+     * @param pageNumber
      * @param pageSize
      * @return
      */
     @CrossOrigin
     @GetMapping("/list")
     public ResponseResult findAllByPage(
-            @RequestParam(value = "page", defaultValue = "1", required = false) Integer page,
+            @RequestParam(value = "pageNumber", defaultValue = "1", required = false) Integer pageNumber,
             @RequestParam(value = "pageSize", defaultValue = "10", required = false) Integer pageSize) {
-        PageRequest pageRequest = PageRequest.of(page - 1, pageSize, Sort.Direction.DESC, "alarmTime");
+        PageRequest pageRequest = PageRequest.of(pageNumber - 1, pageSize, Sort.Direction.DESC, "alarmTime");
         Page<EventInfo> eventInfoList = eventInfoService.findAllByPage(pageRequest);
         return new ResponseResult(ResponseEnum.SUCCESS, eventInfoList);
     }

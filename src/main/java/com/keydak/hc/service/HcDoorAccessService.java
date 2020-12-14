@@ -66,12 +66,12 @@ public class HcDoorAccessService implements IHcDoorAccessService {
     public boolean updateAcsWorkData(int userId) {
         logger.info("updateAcsWorkData");
         AcsWorkStatus.NET_DVR_ACS_WORK_STATUS_V50 acsWorkStatus = new AcsWorkStatus.NET_DVR_ACS_WORK_STATUS_V50();
-        acsWorkStatus.clear();
+//        acsWorkStatus.clear();
         acsWorkStatus.write();
         Pointer acsWorkStatusPointer = acsWorkStatus.getPointer();
-        acsWorkStatus.read();
         IntByReference ibrBytesReturned = new IntByReference(0);
         boolean flag = HCNetSDK.INSTANCE.NET_DVR_GetDVRConfig(userId, AcsWorkStatus.NET_DVR_ACS_WORK_STATUS_V50, 0xFFFFFFFF, acsWorkStatusPointer, acsWorkStatus.size(), ibrBytesReturned);
+        acsWorkStatus.read();
         if (flag) {
             Boolean[] caseStatus = new Boolean[8];
             for (int i = 0; i < acsWorkStatus.byCaseStatus.length; i++) {

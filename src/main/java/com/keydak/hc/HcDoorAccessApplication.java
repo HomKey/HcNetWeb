@@ -1,6 +1,7 @@
 package com.keydak.hc;
 
 import com.keydak.hc.config.HcNetDeviceConfig;
+import com.keydak.hc.core.HCNetSDK;
 import com.keydak.hc.enums.HikSetUpAlarmEnum;
 import com.keydak.hc.service.IEventInfoService;
 import com.keydak.hc.service.IHcDoorAccessService;
@@ -47,11 +48,13 @@ public class HcDoorAccessApplication implements ApplicationRunner {
             int userId = hikService.login(door.getDeviceIp(), Short.parseShort(door.getPort()), door.getUserName(), door.getPassword());
             userIds[i] = userId;
             alarmChanIds[i] = -1;
+            logger.info("userId:" + userId);
+            logger.info(HCNetSDK.INSTANCE.NET_DVR_GetLastError());
             if (userId == -1) {
-                logger.error("注册失败");
+                logger.error("注册失败，错误号:" + HCNetSDK.INSTANCE.NET_DVR_GetLastError());
             } else {
                 alarmChanIds[i] = hikService.setUpAlarmChan(userIds[i], HikSetUpAlarmEnum.Level.MIDDLE, HikSetUpAlarmEnum.AlarmInfoType.NEW,HikSetUpAlarmEnum.DeployType.REALTIME);
-                hcDoorAccessService.startAlarmListen(door.getDeviceIp(), Short.parseShort(door.getPort()));
+//                hcDoorAccessService.startAlarmListen(door.getDeviceIp(), Short.parseShort(door.getPort()));
             }
         }
     }

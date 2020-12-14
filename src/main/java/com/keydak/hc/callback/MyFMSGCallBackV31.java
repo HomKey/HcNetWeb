@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
-//@Component("fmsgCallBackV31")
+@Component("fmsgCallBackV31")
 public class MyFMSGCallBackV31 implements HCNetSDK.FMSGCallBack_V31 {
     @Resource
     private IEventInfoService eventInfoService;
@@ -85,7 +85,6 @@ public class MyFMSGCallBackV31 implements HCNetSDK.FMSGCallBack_V31 {
                         }
                         // database
                         DcimAlarmInfo dcimAlarmInfo = new DcimAlarmInfo();
-                        dcimAlarmInfo.setId(UUID.randomUUID().toString());
                         dcimAlarmInfo.setEventId(0);
                         dcimAlarmInfo.setDeviceId(videoInfo.getDeviceId());
                         dcimAlarmInfo.setDeviceName(videoInfo.getName());
@@ -112,7 +111,13 @@ public class MyFMSGCallBackV31 implements HCNetSDK.FMSGCallBack_V31 {
                     eventInfo.setMajorType(strACSInfo.dwMajor);
                     eventInfo.setMajorType(strACSInfo.dwMinor);
                     Calendar calendar = Calendar.getInstance();
-                    calendar.set(strACSInfo.struTime.dwYear, strACSInfo.struTime.dwMonth, strACSInfo.struTime.dwDay, strACSInfo.struTime.dwHour, strACSInfo.struTime.dwMinute, strACSInfo.struTime.dwSecond);
+                    calendar.set(
+                            strACSInfo.struTime.dwYear,
+                            strACSInfo.struTime.dwMonth - 1,
+                            strACSInfo.struTime.dwDay,
+                            strACSInfo.struTime.dwHour,
+                            strACSInfo.struTime.dwMinute,
+                            strACSInfo.struTime.dwSecond);
                     eventInfo.setAlarmTime(calendar.getTime());
                     eventInfo.setRemoteHostAdd(
                             String.format("%s.%s.%s.%s",

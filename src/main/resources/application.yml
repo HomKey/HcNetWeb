@@ -1,25 +1,25 @@
 hik:
   doors:
-#    - deviceIp: 192.168.7.136
-#      port: 6001
-#      userName: admin
-#      password: admin
-#      name: abc
-  videos:
-    - deviceId: 516E02C2-1635-4783-B0C4-EEEF59C8992E
-      deviceIp: 192.168.7.180
+    - deviceIp: 192.168.7.14
       port: 8000
       userName: admin
-      password: keydak123
-      name: 摄像头
-      alarmInfo:
-        name: name
-        type: 3
-        typeDescription: 安全
-        level: 2
-        levelDescription: 告警
-        content: 区域入侵告警
-        shortContent: 区域入侵告警
+      password: Asd123456
+      name: diankeyuan
+  videos:
+#    - deviceId: 516E02C2-1635-4783-B0C4-EEEF59C8992E
+#      deviceIp: 192.168.7.180
+#      port: 8000
+#      userName: admin
+#      password: keydak123
+#      name: 摄像头
+#      alarmInfo:
+#        name: name
+#        type: 3
+#        typeDescription: 安全
+#        level: 2
+#        levelDescription: 告警
+#        content: 区域入侵告警
+#        shortContent: 区域入侵告警
 #    - deviceId: D4B3004B-46D1-4FB9-9862-EDDEF59E02D7
 #      deviceIp: 192.168.170.26
 #      port: 8000
@@ -68,15 +68,15 @@ spring:
 #  sqlserver
   jpa:
     show-sql: true
-    database: sql_server
+    database: mysql
     hibernate:
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
       ddl-auto: update
-    database-platform: org.hibernate.dialect.SQLServer2008Dialect
+#    database-platform: org.hibernate.dialect.SQLServer2008Dialect
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://192.168.7.136:3307/monitor_dev_hk?useUnicode=true&characterEncoding=utf8&serverTimezone=GMT%2B8
+    url: jdbc:mysql://localhost:3306/cd2000?serverTimezone=Asia/Shanghai&socketTimeout=30000&maxReconnects=80&autoReconnect=true&rewriteBatchedStatements=true&useUnicode=true&characterEncoding=utf-8&useSSL=false
     username: root
     password: root
 #  datasource:
@@ -97,6 +97,4 @@ sms:
   port: 23
   numberArray:
     - 13790327230
-    - 18107535120
-    - 13791327230
 holiday: true
